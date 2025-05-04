@@ -25,7 +25,7 @@ public class ProjectService(IProjectRepository projectRepository, IStatusService
         projectEntity.StatusId = status!.Id;
 
         var result = await _projectRepository.AddAsync(projectEntity);
-
+        
         return result.Succeeded
             ? new ProjectResult { Succeeded = true, StatusCode = 201 }
             : new ProjectResult { Succeeded = false, StatusCode = result.StatusCode, Error = result.Error };

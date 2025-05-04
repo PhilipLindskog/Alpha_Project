@@ -1,31 +1,39 @@
-﻿using Domain.Models;
+﻿using Business.Interfaces;
+using Domain.Extensions;
+using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Threading.Tasks;
 using WebApp.Models;
 
 namespace WebApp.Controllers;
 
-[Authorize]
-public class ProjectsController : Controller
+//[Authorize]
+public class ProjectsController(IProjectService projectService, IClientService clientService, IUserService userService, IStatusService statusService) : Controller
 {
+    private readonly IProjectService _projectService = projectService;
+    private readonly IClientService _clientService = clientService;
+    private readonly IUserService _userService = userService;
+    private readonly IStatusService _statusService = statusService;
+
     [Route("/admin/projects")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         var viewModel = new ProjectsVievModel()
         {
             Projects = SetProjects(),
             AddProjectFormData = new AddProjectViewModel
             {
-                Clients = SetClient(),
-                Members = SetMembers()
+                Clients = await SetClient(),
+                Members = await SetMembers()
             },
             EditProjectFormData = new EditProjectViewModel
             {
-                Clients = SetClient(),
-                Members = SetMembers(),
-                Statuses = SetStatuses()
+                Clients = await SetClient(),
+                Members = await SetMembers(),
+                Statuses = await SetStatuses()
             }
         };
 
@@ -33,7 +41,7 @@ public class ProjectsController : Controller
     }
 
     [HttpPost]
-    public IActionResult AddProject(AddProjectViewModel model)
+    public async Task<IActionResult> AddProject(AddProjectViewModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -45,11 +53,17 @@ public class ProjectsController : Controller
                 );
 
             return BadRequest(new { errors });
-    }
+        }
 
-        //här sparar jag sen ner datan men Project service
+        var formData = model.MapTo<AddProjectFormData>();
+        var result = await _projectService.CreateProjectAsync(formData);
 
-        return Ok();
+        if (result.Succeeded)
+        {
+            return Ok();
+        }
+
+        return Conflict();
     }
 
     public IActionResult EditProject(EditProjectViewModel model)
@@ -90,38 +104,58 @@ public class ProjectsController : Controller
         return projects;
     }
 
-    private IEnumerable<SelectListItem> SetClient()
+    private async Task<IEnumerable<SelectListItem>> SetClient()
     {
-        var client = new List<SelectListItem> //hämta detta från databasen
-        { 
-            new() { Value = "1", Text = "EPN Sverige AB" }, 
-            new() { Value = "2", Text = "Rövarhålan Inc." },
-            new() { Value = "3", Text = "Franz Jaeger AB"}
-        };
+        var result = await _clientService.GetClientsAsync();
         
-        return client;
+        var clients = result.Result;
+
+        if (clients != null)
+        {
+            return clients.Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString(),
+                Text = x.ClientName
+            });
+        }
+
+        return [];
+
     }
 
-    private IEnumerable<SelectListItem> SetMembers()
+    private async Task<IEnumerable<SelectListItem>> SetMembers()
     {
-        var member = new List<SelectListItem> //hämta detta från databasen
-        {
-            new() { Value = "1", Text = "Philip" },
-            new() { Value = "2", Text = "Tyr" },    
-            new() { Value = "3", Text = "Lisen"}
-        };
+        var result = await _userService.GetUsersAsync();
 
-        return member;
+        var members = result.Result;
+        
+        if (members != null)
+        {
+            return members.Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString(),
+                Text = x.FirstName
+            });
+        }
+
+        return [];
     }
 
-    private IEnumerable<SelectListItem> SetStatuses()
+    private async Task<IEnumerable<SelectListItem>> SetStatuses()
     {
-        var status = new List<SelectListItem> //hämta detta från databasen
-        {
-            new() { Value = "1", Text = "STARTED", Selected = true},
-            new() { Value = "2", Text = "COMPLETED" }
-        };
+        var result = await _statusService.GetStatusesAsync();
 
-        return status;
+        var status = result.Result;
+        
+        if (status != null)
+        {
+            return status.Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString(),
+                Text = x.StatusName
+            });
+        }
+
+        return [];
     }
 }

@@ -11,11 +11,11 @@
             <h1>@ViewData["Title"]</h1>
         </div>
 
-        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
 
         <div class="card-body">
 
             <form method="post" asp-controller="Auth" asp-action="Login" novalidate>
+                <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
 
                 <div class="form-group">
                     <label class="form-label" asp-for="Email"></label>

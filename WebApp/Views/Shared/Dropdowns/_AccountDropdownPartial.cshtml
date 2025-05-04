@@ -16,21 +16,21 @@
             </div>
         </div>
 
-        @* <div class="dropdown-body"> *@
-        @*     <nav class="dropdown-options"> *@
-        @*         <div class="dropdown-option"> *@
-        @*             <label for="darkModeToggle" class="switch-label"> *@
-        @*                 <i class="fa-duotone fa-solid fa-cog"></i> *@
-        @*                 <span>Dark Mode</span> *@
-        @*             </label> *@
-        @*             <label for="darkModeToggle" class="switch"> *@
-        @*                 <input type="checkbox" id="darkModeToggle" data-type="toggle" data-func="darkmode"> *@
-        @*                 <span class="slider"></span> *@
-        @*             </label> *@
-        @*         </div> *@
-        @*     </nav> *@
+         <div class="dropdown-body"> 
+             <nav class="dropdown-options">
+                 <div class="dropdown-option">
+                     <label for="darkModeToggle" class="switch-label">
+                         <i class="fa-duotone fa-solid fa-cog"></i>
+                         <span>Dark Mode</span>
+                     </label>
+                     <label for="darkModeToggle" class="switch">
+                         <input type="checkbox" id="darkModeToggle" data-type="toggle" data-func="darkmode">
+                         <span class="slider round"></span>
+                     </label>
+                 </div>
+             </nav>
 
-        @*     <div class="divider"></div> *@
+             <div class="divider"></div> 
 
             <nav class="dropdown-actions">
                 <a class="dropdown-action" asp-controller="Auth" asp-action="Logout">

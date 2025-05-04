@@ -8,7 +8,7 @@ public class AddProjectViewModel
 {
     [Display(Name = "Project Image", Prompt = "Select an image")]
     [DataType(DataType.Upload)]
-    public IFormFile? ProjectImages { get; set; }
+    public IFormFile? ProjectImage { get; set; }
 
     [Required(ErrorMessage = "Project name is required")]
     [Display(Name = "Project Name", Prompt = "Enter Project name")]

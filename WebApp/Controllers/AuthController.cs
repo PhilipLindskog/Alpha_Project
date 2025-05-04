@@ -51,28 +51,42 @@ public class AuthController(IAuthService authService) : Controller
         return View();
     }
 
+    [HttpGet]
+    [Route("auth/login")]
+    public IActionResult Login(string returnUrl = null!)
+    {
+        ViewBag.ReturnUrl = returnUrl ?? Url.Content("~/");
+        return View();
+    }
+
     [HttpPost]
     [Route("auth/login")]
-    public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = "/")
+    public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null!)
     {
         ViewBag.ErrorMessage = "";
         ViewBag.ReturnUrl = returnUrl;
 
-        if (!Url.IsLocalUrl(returnUrl))
+
+        if (string.IsNullOrWhiteSpace(returnUrl) || !Url.IsLocalUrl(returnUrl))
         {
-            returnUrl = "/";
+            returnUrl = Url.Content("~/");
         }
 
 
         if (ModelState.IsValid)
         {
-
             var formData = model.MapTo<SignInFormData>();
             var result = await _authService.SignInAsync(formData);
+
             if (result.Succeeded)
-                return LocalRedirect(returnUrl);
+            {
+                return RedirectToLocal(returnUrl);
+            }
+                
+            ViewBag.ErrorMessage = "Incorrect email or password";
         }
-        ViewBag.ErrorMessage = "Incorrect email or password";
+       
+
         return View(model);
     }
 
@@ -80,5 +94,15 @@ public class AuthController(IAuthService authService) : Controller
     {
         await _authService.SignOutAsync();
         return LocalRedirect("~/");
+    }
+
+    private IActionResult RedirectToLocal(string returnUrl)
+    {
+        if (Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        return RedirectToAction("Index", "Home");
     }
 }

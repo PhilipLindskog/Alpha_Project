@@ -21,10 +21,12 @@ builder.Services.AddIdentity<UserEntity, IdentityRole>(x =>
 builder.Services.ConfigureApplicationCookie(x =>
 {
     x.LoginPath = "/auth/login";
+    x.AccessDeniedPath = "/auth/accessdenied";
     x.Cookie.HttpOnly = true;
     x.Cookie.IsEssential = true;
     x.ExpireTimeSpan = TimeSpan.FromHours(1);
     x.SlidingExpiration = true;
+    x.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
@@ -40,17 +42,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
-else
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-
-}
-
+app.UseHsts();
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
