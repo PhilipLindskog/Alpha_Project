@@ -1257,11 +1257,10 @@ textarea, .form-textarea {
         align-items: center;
     }
 
-        #projects .project .members .user-image {
-            width: 30px;
-            height: 30px;
-            overflow: hidden;
-            border-radius: var(--border-radius);
+        #projects .project .members .user {
+            
+/*            overflow: hidden;*/
+/*            border-radius: var(--border-radius);*/
             display: flex;
             align-items: center;
             justify-content: center;

@@ -4,6 +4,7 @@ using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using System;
 using System.Threading.Tasks;
 using WebApp.Models;
@@ -21,9 +22,9 @@ public class ProjectsController(IProjectService projectService, IClientService c
     [Route("/admin/projects")]
     public async Task<IActionResult> Index()
     {
-        var viewModel = new ProjectsVievModel()
+        var viewModel = new ProjectsViewModel()
         {
-            Projects = SetProjects(),
+            Projects = await SetProjects(),
             AddProjectFormData = new AddProjectViewModel
             {
                 Clients = await SetClient(),
@@ -114,22 +115,27 @@ public class ProjectsController(IProjectService projectService, IClientService c
     }
 
 
-    private IEnumerable<ProjectViewModel> SetProjects()
+    private async Task<IEnumerable<ProjectViewModel>> SetProjects()
     {
-        var projects = new List<ProjectViewModel>();
+        var result = await _projectService.GetProjectsAsync();
+        
 
-        projects.Add(new ProjectViewModel
+        if (!result.Succeeded)
+            return Enumerable.Empty<ProjectViewModel>();
+
+        return result.Result!.Select(x => new ProjectViewModel
         {
-            Id = Guid.NewGuid().ToString(),
-            ProjectImage = "/images/projects/project-template-purple-gradient.svg",
-            ProjectName = "Website Redesign",
-            ClientName = "Funzone Inc",
-            Description = "It is necessary to develop a website redesign in a corporate style. Pokémon!",
-            TimeLeft = "1 week left",
-            Members = ["/images/users/user-template-male-green.svg"]
+            Id = x.Id,
+            ProjectName = x.ProjectName,
+            ClientName = x.Client?.ClientName ?? "No client",
+            Description = x.Description ?? "",
+            ProjectImage = string.IsNullOrEmpty(x.Image)
+                ? "/images/projects/project-template-purple-gradient.svg"
+                : x.Image,
+            TimeLeft = GetTimeLeft(x.EndDate),
+            Members = [x.User?.FirstName ?? "No member"]
         });
 
-        return projects;
     }
 
     private async Task<IEnumerable<SelectListItem>> SetClient()
@@ -185,5 +191,14 @@ public class ProjectsController(IProjectService projectService, IClientService c
         }
 
         return [];
+    }
+
+    private string GetTimeLeft(DateTime? endDate) //Genererad med hjälp av chatGPT för att kunna visa antal dagar kvar på projectet.
+    {
+        if (endDate == null)
+            return "No deadline";
+
+        var daysLeft = (endDate.Value - DateTime.Now).Days;
+        return daysLeft <= 0 ? "Past deadline" : $"{daysLeft} day(s) left"; 
     }
 }

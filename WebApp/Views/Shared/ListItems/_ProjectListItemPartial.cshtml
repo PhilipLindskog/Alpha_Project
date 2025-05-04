@@ -48,13 +48,11 @@
             <span>@Model.TimeLeft</span>
         </div>
         <div class="members">
-            <div class="user-image">
-                <img src="/images/users/user-template-male-green.svg" alt="template avatar" />
-            </div>
+            
             @foreach(var member in Model.Members)
             {
-                <div class="user-image">
-                    <img src="@member" alt="template avatar" />
+                <div class="user">
+                    <span>@member</span>
                 </div>
             }
         </div>

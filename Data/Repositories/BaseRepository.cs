@@ -112,6 +112,21 @@ public abstract class BaseRepository<TEntity, TModel> : IBaseRepository<TEntity,
         return new RepositoryResult<TEntity> { Succeeded = true, StatusCode = 200, Result = entity };
     }
 
+    public virtual async Task<RepositoryResult<IEnumerable<TEntity>>> GetEntityAsync(params Expression<Func<TEntity, object>>[] includes)
+    {
+        IQueryable<TEntity> query = _table;
+
+        if (includes != null && includes.Length != 0)
+        {
+            foreach (var include in includes)
+                query = query.Include(include);
+        }
+
+        var result = await query.ToListAsync();
+
+        return new RepositoryResult<IEnumerable<TEntity>> { Succeeded = true, StatusCode = 200, Result = result };
+    }
+
     public virtual async Task<RepositoryResult<bool>> ExistsAsync(Expression<Func<TEntity, bool>> findBy)
     {
         var exists = await _table.AnyAsync(findBy);
