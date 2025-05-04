@@ -17,7 +17,7 @@ public class AddProjectViewModel
 
     [Required(ErrorMessage = "You must select a client")]
     [Display(Name = "Clients", Prompt = "Select a client")]
-    public string? ClientId { get; set; }
+    public string ClientId { get; set; } = null!;
 
     public IEnumerable<SelectListItem> Clients { get; set; } = [];
 
@@ -28,7 +28,7 @@ public class AddProjectViewModel
     [Required(ErrorMessage = "You must set a start date")]
     [Display(Name = "Start Date", Prompt = "Enter start date")]
     [DataType(DataType.Date)]
-    public DateTime? StartDate { get; set; } = DateTime.Now;
+    public DateTime StartDate { get; set; } = DateTime.Now;
 
     [Display(Name = "End Date", Prompt = "Enter end date")]
     [DataType(DataType.Date)]
@@ -36,7 +36,7 @@ public class AddProjectViewModel
 
     [Required(ErrorMessage = "You must select a member")]
     [Display(Name = "Member", Prompt = "Select a member")]
-    public string? MemberId { get; set; }
+    public string MemberId { get; set; } = null!;
 
     public IEnumerable<SelectListItem> Members { get; set; } = [];
 

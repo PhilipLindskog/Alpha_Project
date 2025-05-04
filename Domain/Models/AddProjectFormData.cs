@@ -1,8 +1,10 @@
-﻿namespace Domain.Models;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Domain.Models;
 
 public class AddProjectFormData
 {
-    public string? Image { get; set; }
+    public string? Images { get; set; }
     public string ProjectName { get; set; } = null!;
     public string? Description { get; set; }
     public DateTime StartDate { get; set; }

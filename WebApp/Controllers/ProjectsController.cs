@@ -55,7 +55,35 @@ public class ProjectsController(IProjectService projectService, IClientService c
             return BadRequest(new { errors });
         }
 
-        var formData = model.MapTo<AddProjectFormData>();
+        string imagePath = string.Empty;
+
+        if (model.ProjectImage != null && model.ProjectImage.Length > 0) //skapad med hjälp av chatGPT 4o för att hjälpa till att fixa i ordning filvägen för projektets bild
+        {
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+            Directory.CreateDirectory(uploadsFolder);
+
+            var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ProjectImage.FileName);
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using var fileStream = new FileStream(filePath, FileMode.Create);
+            await model.ProjectImage.CopyToAsync(fileStream);
+
+            imagePath = "/uploads/" + uniqueFileName;
+        }
+
+        var formData = new AddProjectFormData
+        {
+            Images = imagePath,
+            ProjectName = model.ProjectName,
+            Description = model.Description,
+            StartDate = model.StartDate,
+            EndDate = model.EndDate,
+            Budget = model.Budget,
+            ClientId = model.ClientId,
+            UserId = model.MemberId,
+            StatusId = 1
+        };
+
         var result = await _projectService.CreateProjectAsync(formData);
 
         if (result.Succeeded)
