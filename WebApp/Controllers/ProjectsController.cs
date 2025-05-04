@@ -11,7 +11,7 @@ using WebApp.Models;
 
 namespace WebApp.Controllers;
 
-//[Authorize]
+[Authorize]
 public class ProjectsController(IProjectService projectService, IClientService clientService, IUserService userService, IStatusService statusService) : Controller
 {
     private readonly IProjectService _projectService = projectService;
